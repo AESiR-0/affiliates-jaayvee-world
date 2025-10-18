@@ -5,6 +5,11 @@ import { getAffiliateByUserId, getDashboardStats } from '@/lib/affiliates';
 export async function GET() {
   try {
     const { user, affiliate } = await requireAuth();
+    
+    if (!affiliate) {
+      return NextResponse.json({ error: 'Affiliate access required' }, { status: 403 });
+    }
+    
     const data = await getAffiliateByUserId(user.id);
     const stats = await getDashboardStats(affiliate.id);
 

@@ -1,4 +1,5 @@
 import { requireAuth } from '@/lib/auth';
+import { getAffiliateByUserId } from '@/lib/affiliates';
 
 export default async function AccountPage() {
   const { user, affiliate } = await requireAuth();
@@ -19,6 +20,26 @@ export default async function AccountPage() {
       </div>
     );
   }
+
+  // Get full affiliate data
+  const affiliateData = await getAffiliateByUserId(user.id);
+  if (!affiliateData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">No Affiliate Data Found</h1>
+          <p className="text-gray-600 mb-6">Please contact support to set up your affiliate account.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const affiliateInfo = affiliateData.aff;
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
@@ -47,21 +68,21 @@ export default async function AccountPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Affiliate Code</label>
                 <div className="bg-gray-100 rounded-lg p-3">
-                  <span className="text-lg font-mono font-bold text-gray-900">{affiliate.code}</span>
+                  <span className="text-lg font-mono font-bold text-gray-900">{affiliateInfo.code}</span>
                 </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 <div className="bg-gray-100 rounded-lg p-3">
-                  <span className="text-gray-900">{affiliate.name}</span>
+                  <span className="text-gray-900">{affiliateInfo.name}</span>
                 </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                 <div className="bg-gray-100 rounded-lg p-3">
-                  <span className="text-gray-900">{affiliate.email}</span>
+                  <span className="text-gray-900">{affiliateInfo.email}</span>
                 </div>
               </div>
             </div>
@@ -70,7 +91,7 @@ export default async function AccountPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                 <div className="bg-gray-100 rounded-lg p-3">
-                  <span className="text-gray-900">{affiliate.phone || 'Not provided'}</span>
+                  <span className="text-gray-900">{affiliateInfo.phone || 'Not provided'}</span>
                 </div>
               </div>
               
@@ -78,11 +99,11 @@ export default async function AccountPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <div className="flex items-center gap-2">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    affiliate.isActive 
+                    affiliateInfo.isActive 
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-red-100 text-red-800'
                   }`}>
-                    {affiliate.isActive ? 'Active' : 'Inactive'}
+                    {affiliateInfo.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
@@ -91,7 +112,7 @@ export default async function AccountPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Member Since</label>
                 <div className="bg-gray-100 rounded-lg p-3">
                   <span className="text-gray-900">
-                    {new Date(affiliate.createdAt).toLocaleDateString('en-US', {
+                    {new Date(affiliateInfo.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'

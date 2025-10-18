@@ -11,7 +11,15 @@ export interface AffiliateData {
     id: string;
     userId: string;
     code: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    isActive: boolean;
+    commissionRate: string;
+    totalEarnings: string;
+    totalReferrals: number;
     createdAt: Date;
+    updatedAt: Date;
   };
   brands: Array<{
     ventureId: string;
@@ -41,7 +49,20 @@ export interface DashboardStats {
 
 export async function getAffiliateByUserId(userId: string): Promise<AffiliateData | null> {
   const [aff] = await db
-    .select()
+    .select({
+      id: affiliates.id,
+      userId: affiliates.userId,
+      code: affiliates.code,
+      name: affiliates.name,
+      email: affiliates.email,
+      phone: affiliates.phone,
+      isActive: affiliates.isActive,
+      commissionRate: affiliates.commissionRate,
+      totalEarnings: affiliates.totalEarnings,
+      totalReferrals: affiliates.totalReferrals,
+      createdAt: affiliates.createdAt,
+      updatedAt: affiliates.updatedAt
+    })
     .from(affiliates)
     .where(eq(affiliates.userId, userId))
     .limit(1);

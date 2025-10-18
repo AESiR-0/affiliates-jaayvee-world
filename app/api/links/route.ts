@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { db } from '@/db/client';
-import { affiliateLinks } from '@/db/schema';
+import { db, affiliateLinks } from '@/db';
 import { eq } from 'drizzle-orm';
 
 export async function POST(req: Request) {
   try {
     const { user, affiliate } = await requireAuth();
+    
+    if (!affiliate) {
+      return NextResponse.json({ error: 'Affiliate access required' }, { status: 403 });
+    }
+    
     const { ventureId, urlPath } = await req.json();
 
     if (!ventureId) {
@@ -21,9 +25,9 @@ export async function POST(req: Request) {
       .values({
         affiliateId: affiliate.id,
         ventureId,
-        code,
-        urlPath: urlPath || null,
-        active: true,
+        linkCode: code,
+        originalUrl: urlPath || '',
+        isActive: true,
       })
       .returning();
 
@@ -37,6 +41,10 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const { affiliate } = await requireAuth();
+    
+    if (!affiliate) {
+      return NextResponse.json({ error: 'Affiliate access required' }, { status: 403 });
+    }
     
     const links = await db
       .select()
