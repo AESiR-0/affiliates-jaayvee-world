@@ -3,6 +3,9 @@ import { getAffiliateByUserId, getDashboardStats, generateReferralLink } from '@
 import CopyButton from '@/components/CopyButton';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default async function LinksPage() {
   const { user, affiliate } = await requireAuth();
     

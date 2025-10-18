@@ -6,6 +6,9 @@ import BrandCard from '@/components/BrandCard';
 import EventsSection from '@/components/EventsSection';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const { user, affiliate } = await requireAuth();
     

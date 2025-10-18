@@ -1,6 +1,9 @@
 import { requireAuth } from '@/lib/auth';
 import { getAffiliateByUserId } from '@/lib/affiliates';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default async function AccountPage() {
   const { user, affiliate } = await requireAuth();
     
