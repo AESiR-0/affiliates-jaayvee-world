@@ -15,9 +15,9 @@ export interface AffiliateData {
     email: string;
     phone: string | null;
     isActive: boolean;
-    commissionRate: string;
-    totalEarnings: string;
-    totalReferrals: number;
+    commissionRate: string | null;
+    totalEarnings: string | null;
+    totalReferrals: number | null;
     createdAt: Date;
     updatedAt: Date;
   };
