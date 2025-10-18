@@ -2,14 +2,51 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+interface UserData {
+  fullName: string;
+  email: string;
+  userType: string;
+}
+
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    // Fetch user data from the API
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            setUserData({
+              fullName: data.user.fullName,
+              email: data.user.email,
+              userType: 'affiliate' // We can get this from session if needed
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        // Fallback to default values
+        setUserData({
+          fullName: 'Affiliate User',
+          email: 'affiliate@example.com',
+          userType: 'affiliate'
+        });
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const navigation = [
     {
@@ -121,11 +158,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="p-4 border-t border-gray-700">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">A</span>
+                <span className="text-white font-semibold text-sm">
+                  {userData?.fullName?.charAt(0) || 'A'}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">Affiliate User</p>
-                <p className="text-xs text-gray-400 truncate">affiliate@example.com</p>
+                <p className="text-sm font-medium text-white truncate">
+                  {userData?.fullName || 'Loading...'}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {userData?.email || 'Loading...'}
+                </p>
               </div>
             </div>
           </div>
