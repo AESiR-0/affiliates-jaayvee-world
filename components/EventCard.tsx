@@ -12,6 +12,7 @@ interface EventCardProps {
   venue: any;
   banner: string | null;
   slug: string | null;
+  ventureId?: string;
   onGenerateLink: (eventId: string, eventTitle: string) => void;
 }
 
@@ -24,6 +25,7 @@ export default function EventCard({
   venue, 
   banner, 
   slug,
+  ventureId,
   onGenerateLink 
 }: EventCardProps) {
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
@@ -44,6 +46,7 @@ export default function EventCard({
           eventId: id,
           eventTitle: title,
           originalUrl: originalUrl,
+          ventureId: ventureId,
         }),
       });
 

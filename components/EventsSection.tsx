@@ -11,6 +11,7 @@ interface Event {
   venue: any;
   banner: string | null;
   slug: string | null;
+  ventureId?: string;
 }
 
 interface EventsSectionProps {
@@ -50,6 +51,7 @@ export default function EventsSection({ events }: EventsSectionProps) {
               venue={event.venue}
               banner={event.banner}
               slug={event.slug}
+              ventureId={event.ventureId}
               onGenerateLink={handleGenerateLink}
             />
           ))}

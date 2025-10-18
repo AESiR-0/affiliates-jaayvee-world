@@ -42,8 +42,9 @@ export default async function DashboardPage() {
     // Fetch events
     let events = [];
     try {
-      console.log('Dashboard: Fetching events from /api/events');
-      const eventsResponse = await fetch('/api/events', {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3007';
+      console.log('Dashboard: Fetching events from', `${baseUrl}/api/events`);
+      const eventsResponse = await fetch(`${baseUrl}/api/events`, {
         cache: 'no-store'
       });
       console.log('Dashboard: Events response status:', eventsResponse.status);
@@ -87,7 +88,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-8">
@@ -152,14 +153,6 @@ export default async function DashboardPage() {
 
         {/* Events Section */}
         <div className="mb-8">
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
-            <strong>Debug Info:</strong> Events array length: {events.length}
-            {events.length > 0 && (
-              <div className="mt-2">
-                <strong>First event:</strong> {JSON.stringify(events[0], null, 2)}
-              </div>
-            )}
-          </div>
           <EventsSection events={events} />
         </div>
 

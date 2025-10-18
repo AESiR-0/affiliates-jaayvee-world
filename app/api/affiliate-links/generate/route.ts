@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { eventId, eventTitle, originalUrl } = await request.json();
+    const { eventId, eventTitle, originalUrl, ventureId } = await request.json();
 
     if (!eventId || !originalUrl) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       .insert(affiliateLinks)
       .values({
         affiliateId: affiliate.id,
-        ventureId: 'default-venture', // You might want to get this from event
+        ventureId: ventureId || '1c227c65-0830-4a94-8efc-0f4ec8137a7f', // Use provided ventureId or default
         eventId: eventId,
         linkCode: linkCode,
         originalUrl: originalUrl,

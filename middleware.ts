@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const PUBLIC_ROUTES = ['/login', '/signup', '/api/auth/login', '/api/auth/signup', '/api/auth/logout'];
+const PUBLIC_ROUTES = ['/login', '/signup', '/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/events'];
 
 async function getSessionToken(req: NextRequest) {
   const token = req.cookies.get('session')?.value;
