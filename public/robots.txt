@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://affiliates.jaayvee.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Allow important pages
+Allow: /affiliate/
+Allow: /dashboard/
+Allow: /earnings/
+Allow: /referrals/
+Allow: /auth/
+Allow: /terms/
+Allow: /privacy/
