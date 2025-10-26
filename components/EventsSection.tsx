@@ -19,12 +19,8 @@ interface EventsSectionProps {
 }
 
 export default function EventsSection({ events }: EventsSectionProps) {
-  console.log('EventsSection: Received events:', events);
-  console.log('EventsSection: Events length:', events.length);
-  
   const handleGenerateLink = (eventId: string, eventTitle: string) => {
     // TODO: Implement affiliate link generation for events
-    console.log('Generate affiliate link for event:', eventId, eventTitle);
     // This could open a modal or redirect to a link generation page
     alert(`Generate affiliate link for: ${eventTitle}`);
   };

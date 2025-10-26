@@ -46,29 +46,20 @@ export default async function DashboardPage() {
     let events = [];
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3007';
-      console.log('Dashboard: Fetching events from', `${baseUrl}/api/events`);
       const eventsResponse = await fetch(`${baseUrl}/api/events`, {
         cache: 'no-store'
       });
-      console.log('Dashboard: Events response status:', eventsResponse.status);
       
       if (eventsResponse.ok) {
         const contentType = eventsResponse.headers.get('content-type');
-        console.log('Dashboard: Content-type:', contentType);
         
         if (contentType && contentType.includes('application/json')) {
           const eventsData = await eventsResponse.json();
-          console.log('Dashboard: Events data received:', eventsData);
           events = eventsData.data || [];
-          console.log('Dashboard: Events array length:', events.length);
-        } else {
-          console.error('Events API returned non-JSON response');
         }
-      } else {
-        console.error('Events API returned error:', eventsResponse.status);
       }
     } catch (error) {
-      console.error('Failed to fetch events:', error);
+      // Failed to fetch events
     }
 
   if (!data) {

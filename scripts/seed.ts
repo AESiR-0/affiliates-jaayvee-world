@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs';
 
 async function seed() {
   try {
-    console.log('🌱 Starting database seed...');
 
     // Create affiliate role if it doesn't exist
     let affiliateRole;
@@ -24,13 +23,10 @@ async function seed() {
             level: 20,
           })
           .returning();
-        console.log('✅ Created affiliate role');
       } else {
         affiliateRole = existingRole;
-        console.log('✅ Affiliate role already exists');
       }
     } catch (error) {
-      console.log('⚠️  Could not check/create affiliate role, continuing...');
       // Create a mock role object for the rest of the script
       affiliateRole = { id: 'temp-role-id' };
     }
