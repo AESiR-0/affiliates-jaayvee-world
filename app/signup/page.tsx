@@ -11,6 +11,10 @@ export default function SignupPage() {
     password: '',
     confirmPassword: '',
     phone: '',
+    businessName: '',
+    website: '',
+    socialMedia: '',
+    referralSource: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,6 +49,10 @@ export default function SignupPage() {
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
+          businessName: formData.businessName,
+          website: formData.website,
+          socialMedia: formData.socialMedia,
+          referralSource: formData.referralSource,
         }),
       });
 
