@@ -28,7 +28,7 @@ function validatePassword(password: string): { isValid: boolean; error?: string 
 // Function to register with jaayvee-world API
 async function registerWithJaayveeWorld(userData: any) {
   try {
-    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000'}/api/affiliates/register`, {
+    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'https://talaash.thejaayveeworld.com'}/api/affiliates/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

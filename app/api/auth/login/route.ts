@@ -7,7 +7,7 @@ import { createSession } from '@/lib/auth';
 // Function to authenticate with jaayvee-world API
 async function authenticateWithJaayveeWorld(email: string, password: string) {
   try {
-    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000'}/api/affiliates/login`, {
+    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'https://talaash.thejaayveeworld.com'}/api/affiliates/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
