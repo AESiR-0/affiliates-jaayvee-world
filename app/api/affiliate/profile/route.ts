@@ -20,8 +20,13 @@ export async function GET(request: NextRequest) {
     let query;
     if (affiliateId) {
       query = eq(affiliates.id, affiliateId);
-    } else {
+    } else if (affiliateCode) {
       query = eq(affiliates.code, affiliateCode);
+    } else {
+      return NextResponse.json(
+        { error: 'Affiliate ID or code is required' },
+        { status: 400 }
+      );
     }
 
     const [affiliate] = await db

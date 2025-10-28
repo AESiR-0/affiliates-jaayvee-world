@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
         linkCode: link.linkCode,
         clicks: link.clicks || 0,
         conversions: link.conversions || 0,
-        conversionRate: link.clicks > 0 ? ((link.conversions || 0) / link.clicks * 100).toFixed(2) : '0.00',
+        conversionRate: (link.clicks || 0) > 0 ? ((link.conversions || 0) / (link.clicks || 0) * 100).toFixed(2) : '0.00',
         isActive: link.isActive,
       }));
 
