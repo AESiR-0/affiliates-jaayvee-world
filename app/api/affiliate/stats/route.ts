@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       id: commission.id,
       amount: commission.amount,
       status: commission.status,
-      description: commission.description,
+      notes: commission.notes,
       createdAt: commission.createdAt,
     }));
 
