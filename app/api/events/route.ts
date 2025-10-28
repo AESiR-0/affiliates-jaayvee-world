@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Fetch events from Talaash production API
-    const talaashBaseUrl = 'https://talaash.thejaayveeworld.com';
+    const talaashBaseUrl = process.env.NEXT_PUBLIC_TALAASH_API_URL || 'https://talaash.thejaayveeworld.com';
     
     const eventsResponse = await fetch(`${talaashBaseUrl}/api/events`, {
       cache: 'no-store',
