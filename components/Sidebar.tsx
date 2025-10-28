@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface SidebarProps {
@@ -17,7 +17,9 @@ interface UserData {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     // Fetch user data from the API
@@ -48,6 +50,33 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     fetchUserData();
   }, []);
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Redirect to login page
+        router.push('/login');
+      } else {
+        console.error('Logout failed');
+        // Still redirect to login page even if logout API fails
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still redirect to login page even if logout API fails
+      router.push('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const navigation = [
     {
       name: 'Dashboard',
@@ -59,24 +88,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </svg>
       ),
     },
-    {
-      name: 'Links',
-      href: '/links',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Events',
-      href: '/events',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
+   
     {
       name: 'Account',
       href: '/account',
@@ -156,7 +168,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* User info */}
           <div className="p-4 border-t border-gray-700">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold text-sm">
                   {userData?.fullName?.charAt(0) || 'A'}
@@ -171,6 +183,30 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </p>
               </div>
             </div>
+            
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoggingOut ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Logging out...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

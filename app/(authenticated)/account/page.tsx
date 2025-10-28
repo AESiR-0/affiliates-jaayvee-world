@@ -45,7 +45,7 @@ export default async function AccountPage() {
   const affiliateInfo = affiliateData.aff;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="bg-gradient-to-br min-h-screen from-gray-900 via-gray-800 to-black">
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-8">
@@ -126,20 +126,7 @@ export default async function AccountPage() {
             </div>
           </div>
           
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Actions</h3>
-            <div className="flex gap-4">
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                Edit Profile
-              </button>
-              <button className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors">
-                Change Password
-              </button>
-              <button className="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
-                Deactivate Account
-              </button>
-            </div>
-          </div>
+         
         </div>
       </div>
     </div>

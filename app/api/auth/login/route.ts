@@ -75,14 +75,27 @@ export async function POST(request: NextRequest) {
     // Create session
     const token = await createSession(user.id, localAffiliate.id, user.role.name, 'affiliate');
 
-    // Set cookie
+    // Set cookies - both local session and jaayvee-world auth cookie
     const response = NextResponse.json({ success: true });
+    
+    // Set local session cookie
     response.cookies.set('session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
+
+    // Set jaayvee-world auth cookie for API calls
+    if (authResult.token) {
+      response.cookies.set('auth-token', authResult.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        domain: process.env.NODE_ENV === 'production' ? '.thejaayveeworld.com' : undefined,
+      });
+    }
 
     return response;
   } catch (error) {

@@ -1,4 +1,5 @@
 import { requireAuth } from '@/lib/auth';
+import { getAffiliateByUserId } from '@/lib/affiliates';
 import EventsSection from '@/components/EventsSection';
 
 // Force dynamic rendering
@@ -24,7 +25,29 @@ export default async function EventsPage() {
     );
   }
 
-  // Fetch events
+  // Get affiliate data to access the code
+  const data = await getAffiliateByUserId(user.id);
+  
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">No Affiliate Data Found</h1>
+          <p className="text-gray-600 mb-6">Please contact support to set up your affiliate account.</p>
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+            Contact Support
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch events from jaayvee-world backend API (live data)
   let events = [];
   try {
     const eventsResponse = await fetch('/api/events', {
@@ -64,7 +87,7 @@ export default async function EventsPage() {
         </div>
 
         {/* Events Section */}
-        <EventsSection events={events} />
+        <EventsSection events={events} affiliateCode={data.aff.code} />
       </div>
     </div>
   );

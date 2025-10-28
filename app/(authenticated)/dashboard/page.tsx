@@ -42,12 +42,16 @@ export default async function DashboardPage() {
     const data = await getAffiliateByUserId(user.id);
     const stats = await getDashboardStats(affiliate.id);
 
-    // Fetch events
-    let events = [];
+    // Fetch events from jaayvee-world backend API (live data)
+    let events: any[] = [];
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3007';
-      const eventsResponse = await fetch(`${baseUrl}/api/events`, {
-        cache: 'no-store'
+      const jaayveeWorldUrl = process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000';
+      const eventsResponse = await fetch(`${jaayveeWorldUrl}/api/talaash/events/summary`, {
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'AffiliateHub/1.0',
+        }
       });
       
       if (eventsResponse.ok) {
@@ -55,11 +59,15 @@ export default async function DashboardPage() {
         
         if (contentType && contentType.includes('application/json')) {
           const eventsData = await eventsResponse.json();
-          events = eventsData.data || [];
+          // Combine recent and upcoming events
+          events = [
+            ...(eventsData.data?.summary?.recentEvents || []),
+            ...(eventsData.data?.summary?.upcomingEvents || [])
+          ];
         }
       }
     } catch (error) {
-      // Failed to fetch events
+      console.error('Failed to fetch events:', error);
     }
 
   if (!data) {
@@ -147,7 +155,7 @@ export default async function DashboardPage() {
 
         {/* Events Section */}
         <div className="mb-8">
-          <EventsSection events={events} />
+          <EventsSection events={events} affiliateCode={data.aff.code} />
         </div>
 
         {/* Referral Code & Links */}

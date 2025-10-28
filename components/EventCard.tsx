@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CopyButton from './CopyButton';
+import ShareModal from './ShareModal';
 
 interface EventCardProps {
   id: string;
@@ -13,7 +14,7 @@ interface EventCardProps {
   banner: string | null;
   slug: string | null;
   ventureId?: string;
-  onGenerateLink: (eventId: string, eventTitle: string) => void;
+  affiliateCode?: string;
 }
 
 export default function EventCard({ 
@@ -26,43 +27,29 @@ export default function EventCard({
   banner, 
   slug,
   ventureId,
-  onGenerateLink 
+  affiliateCode
 }: EventCardProps) {
-  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [shareModal, setShareModal] = useState<{ isOpen: boolean; url: string; title: string }>({
+    isOpen: false,
+    url: '',
+    title: ''
+  });
 
-  const handleGenerateLink = async () => {
-    setIsGenerating(true);
-    try {
-      const eventSlug = slug || id;
-      const originalUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/events/${eventSlug}`;
-      
-      const response = await fetch('/api/affiliate-links/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          eventId: id,
-          eventTitle: title,
-          originalUrl: originalUrl,
-          ventureId: ventureId,
-        }),
-      });
+  const generateAffiliateLink = () => {
+    if (!affiliateCode) return '';
+    const eventSlug = slug || id;
+    const baseUrl = process.env.NEXT_PUBLIC_TALAASH_BASE_URL || 'https://talaash.thejaayveeworld.com';
+    return `${baseUrl}/events/${eventSlug}?ref=${affiliateCode}`;
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        setGeneratedLink(data.data.originalUrl);
-        onGenerateLink(id, title);
-      } else {
-        throw new Error('Failed to generate affiliate link');
-      }
-    } catch (error) {
-      console.error('Error generating link:', error);
-      alert('Failed to generate affiliate link. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
+  const affiliateLink = generateAffiliateLink();
+
+  const openShareModal = (url: string, title: string) => {
+    setShareModal({
+      isOpen: true,
+      url,
+      title
+    });
   };
 
   const formatDate = (date: Date) => {
@@ -136,44 +123,41 @@ export default function EventCard({
           </div>
         </div>
         
-        {!generatedLink ? (
-          <button
-            onClick={handleGenerateLink}
-            disabled={isGenerating}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {isGenerating ? (
-              <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Generating...
-              </div>
-            ) : (
-              'Generate Affiliate Link'
-            )}
-          </button>
-        ) : (
+        {affiliateCode && affiliateLink ? (
           <div className="space-y-3">
             <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <div className="text-sm text-green-800 font-medium mb-2">Generated Affiliate Link:</div>
+              <div className="text-sm text-green-800 font-medium mb-2">Your Affiliate Link:</div>
               <div className="font-mono text-sm text-green-900 bg-white p-2 rounded border break-all">
-                {generatedLink}
+                {affiliateLink}
               </div>
             </div>
             <div className="flex gap-2">
-              <CopyButton text={generatedLink} />
+              <CopyButton text={affiliateLink} />
               <button
-                onClick={() => setGeneratedLink(null)}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200"
+                onClick={() => openShareModal(affiliateLink, title)}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
               >
-                Generate New Link
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+                <span>Share</span>
               </button>
             </div>
           </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-gray-500 text-sm">Affiliate code not available</p>
+          </div>
         )}
       </div>
+      
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal({ isOpen: false, url: '', title: '' })}
+        url={shareModal.url}
+        title={shareModal.title}
+      />
     </div>
   );
 }

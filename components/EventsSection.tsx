@@ -16,15 +16,10 @@ interface Event {
 
 interface EventsSectionProps {
   events: Event[];
+  affiliateCode?: string;
 }
 
-export default function EventsSection({ events }: EventsSectionProps) {
-  const handleGenerateLink = (eventId: string, eventTitle: string) => {
-    // TODO: Implement affiliate link generation for events
-    // This could open a modal or redirect to a link generation page
-    alert(`Generate affiliate link for: ${eventTitle}`);
-  };
-
+export default function EventsSection({ events, affiliateCode }: EventsSectionProps) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-6">
@@ -48,7 +43,7 @@ export default function EventsSection({ events }: EventsSectionProps) {
               banner={event.banner}
               slug={event.slug}
               ventureId={event.ventureId}
-              onGenerateLink={handleGenerateLink}
+              affiliateCode={affiliateCode}
             />
           ))}
         </div>

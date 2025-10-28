@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { users, roles, affiliates } from '@/db';
+import { affiliates } from '@/db';
 import { eq } from 'drizzle-orm';
-import { hashPassword } from '@/lib/auth-manual';
 
 // Enhanced validation function
 function validateEmail(email: string): boolean {
@@ -26,11 +25,28 @@ function validatePassword(password: string): { isValid: boolean; error?: string 
   return { isValid: true };
 }
 
-function generateAffiliateCode(): string {
-  const prefix = 'AFF';
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${prefix}${timestamp}${random}`;
+// Function to register with jaayvee-world API
+async function registerWithJaayveeWorld(userData: any) {
+  try {
+    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000'}/api/affiliates/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Registration failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Jaayvee-world registration error:', error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -54,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Email validation
     if (!validateEmail(email)) {
       return NextResponse.json(
         { error: 'Please provide a valid email address' },
@@ -62,7 +77,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Password validation
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
@@ -79,126 +93,72 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email.toLowerCase().trim()))
-      .limit(1);
+    // Register with jaayvee-world API
+    const registrationData = {
+      fullName,
+      email,
+      password,
+      phone: phone || null,
+      businessName: businessName || null,
+      website: website || null,
+      socialMedia: socialMedia || null,
+      referralSource: referralSource || null
+    };
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'An account with this email already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Get affiliates role
-    const [affiliatesRole] = await db
-      .select()
-      .from(roles)
-      .where(eq(roles.name, 'affiliate'))
-      .limit(1);
-
-    if (!affiliatesRole) {
-      return NextResponse.json(
-        { error: 'Affiliates role not found. Please contact administrator.' },
-        { status: 500 }
-      );
-    }
-
-    // Hash password
-    const hashedPassword = await hashPassword(password);
-
-    // Generate unique affiliate code
-    let affiliateCode = generateAffiliateCode();
-    let attempts = 0;
+    const authResult = await registerWithJaayveeWorld(registrationData);
     
-    // Ensure affiliate code is unique
-    while (attempts < 5) {
-      const [existingCode] = await db
-        .select()
-        .from(affiliates)
-        .where(eq(affiliates.code, affiliateCode))
-        .limit(1);
-      
-      if (!existingCode) break;
-      
-      affiliateCode = generateAffiliateCode();
-      attempts++;
+    if (!authResult || !authResult.success) {
+      return NextResponse.json(
+        { error: authResult?.error || 'Registration failed' },
+        { status: 400 }
+      );
     }
 
-    if (attempts >= 5) {
+    // Get user data from jaayvee-world response
+    const { user, affiliate } = authResult.data;
+    
+    if (!user || !affiliate) {
       return NextResponse.json(
-        { error: 'Unable to generate unique affiliate code. Please try again.' },
+        { error: 'User or affiliate data not found' },
         { status: 500 }
       );
     }
 
-    // Create user
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        email: email.toLowerCase().trim(),
-        password: hashedPassword,
-        fullName: fullName.trim(),
-        phone: phone?.trim() || null,
-        roleId: affiliatesRole.id,
-        isActive: true,
-      })
-      .returning();
+    // Find affiliate record in local database
+    const [localAffiliate] = await db
+      .select({ id: affiliates.id })
+      .from(affiliates)
+      .where(eq(affiliates.userId, user.id))
+      .limit(1);
 
-    // Create affiliate record with enhanced data
-    const [newAffiliate] = await db
-      .insert(affiliates)
-      .values({
-        userId: newUser.id,
-        code: affiliateCode,
-        name: fullName.trim(),
-        email: email.toLowerCase().trim(),
-        phone: phone?.trim() || null,
-        commissionRate: '5.00', // Default 5% commission
-        totalEarnings: '0.00',
-        totalReferrals: 0,
-        isActive: true,
-      })
-      .returning();
-
-    // Log successful registration
-    console.log(`New affiliate registered: ${newAffiliate.code} - ${newUser.email}`);
+    if (!localAffiliate) {
+      return NextResponse.json(
+        { error: 'No affiliate account found for this user' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Affiliate account created successfully',
       data: {
-        userId: newUser.id,
-        affiliateId: newAffiliate.id,
-        affiliateCode: affiliateCode,
-        email: newUser.email,
-        name: newUser.fullName,
-        commissionRate: '5.00',
-        nextSteps: [
-          'Check your email for a welcome message',
-          'Complete your profile in the dashboard',
-          'Start generating affiliate links',
-          'Track your earnings and referrals'
-        ]
-      }
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          phone: user.phone,
+        },
+        affiliate: {
+          id: affiliate.id,
+          code: affiliate.code,
+        },
+      },
     });
 
   } catch (error) {
-    console.error('Affiliate signup error:', error);
-    
-    // Handle specific database errors
-    if ((error as { code?: string }).code === '23505') { // Unique constraint violation
-      return NextResponse.json(
-        { error: 'An account with this email already exists' },
-        { status: 409 }
-      );
-    }
-    
+    console.error('Signup error:', error);
     return NextResponse.json(
-      { error: 'Failed to create affiliate account. Please try again.' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
