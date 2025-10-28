@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { users, roles, ventures, affiliates, affiliateLinks } from '../db';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../lib/auth-manual';
 
 async function seed() {
   try {
@@ -32,7 +32,7 @@ async function seed() {
     }
 
     // Create test user
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const hashedPassword = await hashPassword('password123');
     
     let testUser;
     try {
@@ -126,7 +126,6 @@ async function seed() {
           ventureId: testVenture.id,
           linkCode: 'LINK' + Math.random().toString(36).substring(2, 8).toUpperCase(),
           originalUrl: 'https://talaash.thejaayveeworld.com/events',
-          shortUrl: 'https://talaash.thejaayveeworld.com/r/' + affiliate.code,
           isActive: true,
         });
       console.log('✅ Created affiliate link');

@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { 
   affiliates, 
-  affiliateLinks, 
+  affiliateLinks,
   affiliateCommissions
 } from '@/db';
 import { and, eq, inArray, sql } from 'drizzle-orm';

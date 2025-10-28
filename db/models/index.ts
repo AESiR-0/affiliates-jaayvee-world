@@ -1,6 +1,3 @@
-// Export all models from organized files
-export * from './enums'
-export * from './user'
+// Export all models from organized subfolders
+export * from './shared'
 export * from './venture'
-export * from './relations'
-

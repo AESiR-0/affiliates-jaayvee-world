@@ -1,15 +1,17 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
-const postgres = require('postgres')
+import postgres from 'postgres'
+import * as schema from './schema'
 
 // Create the connection
 const connectionString = process.env.DATABASE_URL!
 
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set')
+}
+
 // Disable prefetch as it is not supported for "Transaction" pool mode
 const client = postgres(connectionString, { prepare: false })
-
-// Create database client without schema to avoid circular dependencies
-export const db = drizzle(client)
+export const db = drizzle(client, { schema })
 
 // Export schema for use in other files
 export * from './schema'
-export * from './schema-affiliate'

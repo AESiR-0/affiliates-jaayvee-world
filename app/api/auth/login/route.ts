@@ -2,8 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users, affiliates, roles } from '@/db';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
 import { createSession } from '@/lib/auth';
+
+// Function to authenticate with jaayvee-world API
+async function authenticateWithJaayveeWorld(email: string, password: string) {
+  try {
+    const response = await fetch(`${process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000'}/api/affiliates/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Jaayvee-world authentication error:', error);
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,64 +38,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by email with role information
-    const [userWithRole] = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        password: users.password,
-        fullName: users.fullName,
-        roleId: users.roleId,
-        roleName: roles.name,
-        roleLevel: roles.level
-      })
-      .from(users)
-      .innerJoin(roles, eq(users.roleId, roles.id))
-      .where(eq(users.email, email))
+    // Authenticate with jaayvee-world API
+    const authResult = await authenticateWithJaayveeWorld(email, password);
+    
+    if (!authResult || !authResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
+
+    // Get user data from jaayvee-world response
+    const { user, affiliate } = authResult.data;
+    
+    if (!user || !affiliate) {
+      return NextResponse.json(
+        { error: 'User or affiliate data not found' },
+        { status: 401 }
+      );
+    }
+
+    // Find affiliate record in local database
+    const [localAffiliate] = await db
+      .select({ id: affiliates.id })
+      .from(affiliates)
+      .where(eq(affiliates.userId, user.id))
       .limit(1);
 
-    if (!userWithRole) {
+    if (!localAffiliate) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: 'No affiliate account found for this user' },
+        { status: 403 }
       );
-    }
-
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, userWithRole.password);
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
-
-    // Determine user type and get affiliate record if needed
-    let userType: 'affiliate' | 'admin' | 'staff' = 'staff';
-    let affiliateId: string | null = null;
-
-        if (userWithRole.roleName === 'admin') {
-          userType = 'admin';
-        } else if (userWithRole.roleName === 'affiliates') {
-          userType = 'affiliate';
-      // Find affiliate record for affiliate users
-      const [affiliate] = await db
-        .select({ id: affiliates.id })
-        .from(affiliates)
-        .where(eq(affiliates.userId, userWithRole.id))
-        .limit(1);
-
-      if (!affiliate) {
-        return NextResponse.json(
-          { error: 'No affiliate account found for this user' },
-          { status: 403 }
-        );
-      }
-      affiliateId = affiliate.id;
     }
 
     // Create session
-    const token = await createSession(userWithRole.id, affiliateId, userWithRole.roleName, userType);
+    const token = await createSession(user.id, localAffiliate.id, user.role.name, 'affiliate');
 
     // Set cookie
     const response = NextResponse.json({ success: true });

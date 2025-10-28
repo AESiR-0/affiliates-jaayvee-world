@@ -1,8 +1,8 @@
 import { pgTable, uuid, varchar, text, boolean, timestamp, integer, real, jsonb } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
-import { users } from './user'
+import { users } from '../shared/user'
 import { ventures } from './venture'
-import { ticketStatusEnum } from './enums'
+import { ticketStatusEnum } from '../shared/enums'
 
 // Events, Tickets, Orders
 export const events = pgTable('events', {

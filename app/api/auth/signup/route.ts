@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users, roles, affiliates } from '@/db';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '@/lib/auth-manual';
 
 // Enhanced validation function
 function validateEmail(email: string): boolean {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await hashPassword(password);
 
     // Generate unique affiliate code
     let affiliateCode = generateAffiliateCode();
