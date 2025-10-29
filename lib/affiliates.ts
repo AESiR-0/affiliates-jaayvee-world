@@ -25,7 +25,6 @@ export interface AffiliateData {
     ventureId: string;
     name: string;
     logoUrl: string | null;
-    slug: string | null;
   }>;
   links: Array<{
     id: string;
@@ -74,7 +73,6 @@ export async function getAffiliateByUserId(userId: string): Promise<AffiliateDat
     ventureId: string;
     name: string;
     logoUrl: string | null;
-    slug: string | null;
   }> = [];
 
   const links = await db

@@ -27,12 +27,15 @@ export async function middleware(req: NextRequest) {
 
   // Check for valid session
   const token = await getSessionToken(req);
+  
   if (!token) {
+    console.log('❌ Middleware: No valid token, redirecting to login');
     const url = req.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
+  console.log('✅ Middleware: Valid token, allowing:', pathname);
   return NextResponse.next();
 }
 
