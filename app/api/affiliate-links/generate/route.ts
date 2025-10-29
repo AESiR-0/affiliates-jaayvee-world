@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { eventId, eventTitle, originalUrl, ventureId } = await request.json();
+    const { eventId, eventTitle, originalUrl, ventureId, slug } = await request.json();
 
     if (!eventId || !originalUrl) {
       return NextResponse.json(
@@ -34,15 +34,15 @@ export async function POST(request: NextRequest) {
     // Create affiliate link record
     const [newLink] = await db
       .insert(affiliateLinks)
-      .values({
+      .values({ slug: slug,
         affiliateId: affiliate.id,
-        ventureId: ventureId || '1c227c65-0830-4a94-8efc-0f4ec8137a7f', // Use provided ventureId or default
+        ventureId: ventureId || null,
         eventId: eventId,
         linkCode: linkCode,
-        originalUrl: originalUrl,
+        originalUrl: originalUrl, 
         qrCodeUrl: qrCodeUrl,
         isActive: true,
-      })
+      })   
       .returning();
 
     return NextResponse.json({
