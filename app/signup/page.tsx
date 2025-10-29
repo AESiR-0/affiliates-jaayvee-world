@@ -39,7 +39,7 @@ export default function SignupPage() {
     }
 
     try {
-      const response = await fetch('https://talaash.thejaayveeworld.com/api/auth/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

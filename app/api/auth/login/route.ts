@@ -4,6 +4,21 @@ import { users, affiliates, roles } from '@/db';
 import { eq } from 'drizzle-orm';
 import { createSession } from '@/lib/auth';
 
+  export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin') || '*';
+  
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-ID',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
+
 // Function to authenticate with jaayvee-world API
 async function authenticateWithJaayveeWorld(email: string, password: string) {
   try {
@@ -32,30 +47,57 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       );
+      
+      // Add CORS headers
+      const origin = request.headers.get('origin') || '*';
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      
+      return response;
     }
 
     // Authenticate with jaayvee-world API
     const authResult = await authenticateWithJaayveeWorld(email, password);
     
     if (!authResult || !authResult.success) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
+      
+      // Add CORS headers
+      const origin = request.headers.get('origin') || '*';
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      
+      return response;
     }
 
     // Get user data from jaayvee-world response
     const { user, affiliate } = authResult.data;
     
     if (!user || !affiliate) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'User or affiliate data not found' },
         { status: 401 }
       );
+      
+      // Add CORS headers
+      const origin = request.headers.get('origin') || '*';
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      
+      return response;
     }
 
     // Find affiliate record in local database
@@ -66,10 +108,19 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (!localAffiliate) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'No affiliate account found for this user' },
         { status: 403 }
       );
+      
+      // Add CORS headers
+      const origin = request.headers.get('origin') || '*';
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      
+      return response;
     }
 
     // Create session
@@ -97,12 +148,28 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Add CORS headers
+    const origin = request.headers.get('origin') || '*';
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+
     return response;
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
+    
+    // Add CORS headers to error response
+    const origin = request.headers.get('origin') || '*';
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-ID');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    
+    return response;
   }
 }

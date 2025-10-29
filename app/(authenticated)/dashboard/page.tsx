@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     // Fetch events from jaayvee-world backend API (live data)
     let events: any[] = [];
     try {
-      const jaayveeWorldUrl = process.env.JAAYVEE_WORLD_API_URL || 'http://localhost:3000';
+      const jaayveeWorldUrl = process.env.JAAYVEE_WORLD_API_URL || 'https://talaash.thejaayveeworld.com';
       const eventsResponse = await fetch(`${jaayveeWorldUrl}/api/talaash/events/summary`, {
         cache: 'no-store',
         headers: {

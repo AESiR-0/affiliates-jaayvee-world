@@ -22,11 +22,12 @@ export const affiliates = pgTable('affiliates', {
 // Affiliate Links table - tracks individual referral links
 export const affiliateLinks = pgTable('affiliate_links', {
   id: uuid('id').primaryKey().defaultRandom(),
-  affiliateId: uuid('affiliate_id').notNull().references(() => affiliates.id, { onDelete: 'cascade' }),
+  slug: varchar('slug', { length: 255 }).unique().notNull(),
   ventureId: uuid('venture_id').notNull().references(() => ventures.id, { onDelete: 'cascade' }),
   eventId: uuid('event_id'), // Optional - for event-specific links
   linkCode: varchar('link_code', { length: 100 }).unique().notNull(),
   originalUrl: text('original_url'), // The original URL being promoted
+  affiliateId: uuid('affiliate_id').notNull().references(() => affiliates.id, { onDelete: 'cascade' }),
   qrCodeUrl: text('qr_code_url'), // URL to QR code image
   clicks: integer('clicks').default(0),
   conversions: integer('conversions').default(0),
