@@ -122,6 +122,7 @@ async function seed() {
       await db
         .insert(affiliateLinks)
         .values({
+          slug: 'default-slug',
           affiliateId: affiliate.id,
           ventureId: testVenture.id,
           linkCode: 'LINK' + Math.random().toString(36).substring(2, 8).toUpperCase(),
