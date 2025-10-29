@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Affiliate access required' }, { status: 403 });
     }
     
-    const { ventureId, urlPath } = await req.json();
+    const { ventureId, urlPath, slug } = await req.json();
 
     if (!ventureId) {
       return NextResponse.json({ error: 'Venture ID is required' }, { status: 400 });
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     const [newLink] = await db
       .insert(affiliateLinks)
       .values({
+        slug: slug,
         affiliateId: affiliate.id,
         ventureId,
         linkCode: code,
