@@ -22,12 +22,14 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // Include cookies in the request
       });
 
       const data = await response.json();
 
       if (data.success) {
-        router.push('/dashboard');
+        // Use window.location for full page reload to ensure cookie is set
+        window.location.href = '/dashboard';
       } else {
         setError(data.error || 'Login failed');
       }
