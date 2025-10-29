@@ -5,14 +5,30 @@ import { jwtVerify } from 'jose';
 const PUBLIC_ROUTES = ['/login', '/signup', '/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/events'];
 
 async function getSessionToken(req: NextRequest) {
-  const token = req.cookies.get('session')?.value;
-  if (!token) return null;
+  const cookie = req.cookies.get('session');
+  console.log('🔍 Middleware: Checking session cookie:', {
+    exists: !!cookie,
+    hasValue: !!cookie?.value,
+    allCookies: req.cookies.getAll().map(c => c.name)
+  });
+  
+  const token = cookie?.value;
+  if (!token) {
+    console.log('❌ Middleware: No session token found');
+    return null;
+  }
   
   try {
-    const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);
+    if (!process.env.AUTH_SECRET) {
+      console.error('❌ Middleware: AUTH_SECRET is not set!');
+      return null;
+    }
+    const secret = new TextEncoder().encode(process.env.AUTH_SECRET);
     await jwtVerify(token, secret);
+    console.log('✅ Middleware: Token verified successfully');
     return token;
-  } catch {
+  } catch (error) {
+    console.log('❌ Middleware: Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }
