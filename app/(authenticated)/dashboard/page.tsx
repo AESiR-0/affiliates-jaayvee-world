@@ -5,6 +5,7 @@ import CopyButton from '@/components/CopyButton';
 import BrandCard from '@/components/BrandCard';
 import EventsSection from '@/components/EventsSection';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
+import { UpdatesPanel } from '@/components/UpdatesPanel';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -241,6 +242,14 @@ export default async function DashboardPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* Updates Panel */}
+        <div className="mb-8">
+          <UpdatesPanel 
+            audience="affiliates" 
+            apiBaseUrl={process.env.JAAYVEE_WORLD_API_URL || 'https://thejaayveeworld.com'}
+          />
         </div>
 
         {/* Brands Section */}
