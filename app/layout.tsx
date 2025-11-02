@@ -70,6 +70,19 @@ export const metadata: Metadata = {
     canonical: 'https://affiliates.jaayvee.com',
   },
   category: 'business',
+  themeColor: '#1e3a8a',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Jaayvee Affiliates',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    themeColor: '#1e3a8a',
+  },
 };
 
 export default function RootLayout({
@@ -80,6 +93,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="apple-touch-icon" href="/static/logos/affiliates/affiliates_fav.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Jaayvee Affiliates" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
