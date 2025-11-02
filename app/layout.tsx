@@ -81,7 +81,6 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 5,
     userScalable: true,
-    themeColor: '#1e3a8a',
   },
 };
 
