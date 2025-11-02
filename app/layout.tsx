@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://affiliates.jaayvee.com'),
   title: {
     default: "Jaayvee Affiliates - Earn with Every Referral",
     template: "%s | Jaayvee Affiliates"
@@ -70,18 +72,19 @@ export const metadata: Metadata = {
     canonical: 'https://affiliates.jaayvee.com',
   },
   category: 'business',
-  themeColor: '#1e3a8a',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Jaayvee Affiliates',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#1e3a8a',
 };
 
 export default function RootLayout({
@@ -143,6 +146,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <PWAInstallPrompt />
       </body>
     </html>
   );
