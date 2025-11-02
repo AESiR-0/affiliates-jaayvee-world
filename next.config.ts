@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+// @ts-ignore - next-pwa doesn't have proper type definitions compatible with Next.js 15
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
@@ -24,4 +25,5 @@ const pwaConfig = withPWA({
   ],
 });
 
+// @ts-ignore - Type mismatch between next-pwa types and Next.js 15 types
 export default pwaConfig(nextConfig);
