@@ -23,7 +23,7 @@ export default async function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin/Staff Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin/Team Dashboard</h1>
             <p className="text-gray-600 mb-6">Welcome to the admin panel. Affiliate features are not available for your role.</p>
             <div className="space-y-4">
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
