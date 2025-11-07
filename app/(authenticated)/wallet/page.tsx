@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Wallet, TrendingUp, DollarSign, History } from 'lucide-react';
+import MilestoneProgress from '@/components/milestone-progress';
 
 interface WalletData {
   wallet: {
@@ -11,6 +12,15 @@ interface WalletData {
   earnings: {
     totalEarnings: string;
     totalReferrals: number;
+    currentCommissionRate?: number;
+    pendingEarnings?: string;
+    milestoneProgress?: {
+      current: number;
+      next: number | null;
+      progress: number;
+      currentRate: number;
+      nextRate: number | null;
+    };
   };
   transactions: Array<{
     id: string;
@@ -132,6 +142,11 @@ export default function WalletPage() {
             })}
           </p>
           <p className="text-sm text-gray-500 mt-2">All-time earnings from referrals</p>
+          {walletData.earnings.currentCommissionRate !== undefined && (
+            <p className="text-sm text-purple-600 mt-1 font-medium">
+              Current rate: {walletData.earnings.currentCommissionRate}%
+            </p>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -145,6 +160,21 @@ export default function WalletPage() {
           <p className="text-sm text-gray-500 mt-2">Users referred through your links</p>
         </div>
       </div>
+
+      {/* Milestone Progress */}
+      {walletData.earnings.milestoneProgress && (
+        <div className="mb-6">
+          <MilestoneProgress
+            current={walletData.earnings.milestoneProgress.current}
+            next={walletData.earnings.milestoneProgress.next}
+            progress={walletData.earnings.milestoneProgress.progress}
+            currentRate={walletData.earnings.milestoneProgress.currentRate}
+            nextRate={walletData.earnings.milestoneProgress.nextRate}
+            currentCommissionRate={walletData.earnings.currentCommissionRate || 0}
+            pendingEarnings={walletData.earnings.pendingEarnings || '0.00'}
+          />
+        </div>
+      )}
 
       {/* Transactions */}
       <div className="bg-white rounded-lg shadow-md p-6">
