@@ -86,6 +86,15 @@ export default function LoginPage() {
               </div>
             )}
 
+            <div className="text-right">
+              <a 
+                href="https://thejaayveeworld.com/auth/forgot-password" 
+                className="text-sm text-gray-600 hover:text-black"
+              >
+                Forgot password?
+              </a>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
