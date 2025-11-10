@@ -192,6 +192,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
             </div>
             
+            {/* Main Site Link */}
+            <a
+              href="https://thejaayveeworld.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 mb-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              <span>Go to Main Site</span>
+            </a>
+            
             {/* Logout Button */}
             <button
               onClick={handleLogout}

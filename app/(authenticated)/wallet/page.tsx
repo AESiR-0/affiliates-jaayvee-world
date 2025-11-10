@@ -29,6 +29,7 @@ interface WalletData {
     reference: string | null;
     createdAt: Date | string;
   }>;
+  partnerCode?: string | null;
 }
 
 export default function WalletPage() {
@@ -39,6 +40,13 @@ export default function WalletPage() {
   useEffect(() => {
     fetchWalletData();
   }, []);
+
+  // Store partner code in cookie if available
+  useEffect(() => {
+    if (walletData?.partnerCode && typeof window !== 'undefined') {
+      document.cookie = `partnerCode=${walletData.partnerCode}; path=/; max-age=${365 * 24 * 60 * 60}`; // 1 year
+    }
+  }, [walletData?.partnerCode]);
 
   const fetchWalletData = async () => {
     try {
@@ -110,6 +118,32 @@ export default function WalletPage() {
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Wallet & Earnings</h1>
+
+      {/* Partner Code Display */}
+      {walletData?.partnerCode && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Partner Code</h2>
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              value={walletData.partnerCode}
+              disabled
+              readOnly
+              className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 font-mono"
+            />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(walletData.partnerCode!);
+                alert('Partner code copied to clipboard!');
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 mt-2">This is the referral code used when you signed up</p>
+        </div>
+      )}
 
       {/* Wallet Balance Card */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-6 mb-6 text-white">
